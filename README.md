@@ -1,1 +1,1 @@
-# Studia-projekt-Python
+# grupa2-wsb

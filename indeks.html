@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strona z menu bocznym</title>
+    <style>
+     body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #87CEEB;
+    color: white;
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    margin: 5px 0;
+    display: block;
+    border-radius: 5px;
+    background-color: #4682B4;
+    text-align: center;
+    width: 80%;
+}
+
+.sidebar a:hover {
+    background-color: #5A9BD5;
+}
+
+.content {
+    margin-left: 200px;
+    margin-right: 0;
+    margin-top: 60px;
+    margin-bottom: 20px;
+    padding: 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.topbar {
+    width: 100%;
+    background-color: #87CEEB;
+    color: white;
+    padding: 10px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+.topbar .notifications {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-left: -5px; /* ← PRZESUNIĘCIE W LEWO */
+}
+
+.topbar .search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    margin-right: 20px;
+}
+
+.topbar input[type="text"] {
+    padding: 8px;
+    width: 300px;
+    border: none;
+    border-radius: 4px;
+}
+
+.topbar button,
+.notification-button {
+    padding: 8px 15px;
+    background-color: #4682B4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.topbar button:hover,
+.notification-button:hover {
+    background-color: #5A9BD5;
+}
+
+.bottom-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #87CEEB;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.calendar-container,
+.table-container {
+    max-width: 100%;
+    margin: 50px auto;
+    padding: 20px;
+    border: 2px solid #4682B4;
+    border-radius: 8px;
+    background-color: #ffffff;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.calendar-navigation,
+.table-container table {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.calendar-navigation button {
+    padding: 10px;
+    background-color: #4682B4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.calendar-navigation button:hover {
+    background-color: #5A9BD5;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-day {
+    padding: 10px;
+    background-color: #ecf0f1;
+    text-align: center;
+    border-radius: 4px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th,
+table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #4682B4;
+    word-wrap: break-word;
+}
+
+table th {
+    background-color: #4682B4;
+    color: white;
+}
+
+.form-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 2px solid #4682B4;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-container label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+.form-container .date-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.form-container input,
+.form-container select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-container .date-group input {
+    flex: 1;
+}
+
+.form-container button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #4682B4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.form-container button:hover {
+    background-color: #5A9BD5;
+}
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="notifications">
+            <button class="notification-button">
+                Wiadomości
+            </button>
+            <button class="notification-button">
+                Oceny
+            </button>
+        </div>
+        <div class="search">
+            <input type="text" placeholder="Wprowadź zapytanie...">
+            <button>Wyszukaj</button>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <a href="#" onclick="showSection('home')">Strona Główna</a>
+        <a href="#" onclick="showSection('account')">Konto</a>
+        <a href="#" onclick="showSection('calendar')">Kalendarz zajęć</a>
+        <a href="#" onclick="showSection('grade')">Oceny</a>
+        <a href="#" onclick="showSection('planning')">Planowanie Zajęć</a>
+    </div>
+
+    <div class="content">
+        <div id="home" class="section active">
+        </div>
+
+        <div id="account" class="section">
+            <div class="form-container">
+                <label for="firstName">Imię:</label>
+                <input type="text" id="firstName" placeholder="Wpisz imię">
+
+                <label for="middleName">Drugie imię:</label>
+                <input type="text" id="middleName" placeholder="Wpisz drugie imię">
+
+                <label for="lastName">Nazwisko:</label>
+                <input type="text" id="lastName" placeholder="Wpisz nazwisko">
+
+                <label for="birthDate">Data urodzenia:</label>
+                <input type="date" id="birthDate">
+
+                <label for="birthPlace">Miejsce urodzenia:</label>
+                <input type="text" id="birthPlace" placeholder="Wpisz miejsce urodzenia">
+
+                <label for="login">Login:</label>
+                <input type="text" id="login" placeholder="Wpisz login">
+
+                <label for="phoneNumber">Numer telefonu:</label>
+                <input type="tel" id="phoneNumber" placeholder="Wpisz numer telefonu">
+
+                <label for="email">Adres email:</label>
+                <input type="email" id="email" placeholder="Wpisz adres email">
+
+                <button onclick="saveAccountDetails()">Zapisz</button>
+            </div>
+        </div>
+
+        <div id="calendar" class="section">
+            <div class="calendar-container">
+                <div class="calendar-navigation">
+                    <button onclick="changeMonth(-1)">Poprzedni</button>
+                    <span id="calendar-month"></span>
+                    <button onclick="changeMonth(1)">Następny</button>
+                </div>
+                <div id="calendar-days" class="calendar-days"></div>
+            </div>
+        </div>
+
+        <div id="grade" class="section">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nazwa Przedmiotu</th>
+                            <th>Wykładowca</th>
+                            <th>Forma Zaliczenia</th>
+                            <th>Rodzaj Zajęć</th>
+                            <th>Podejście 1</th>
+                            <th>Data 1</th>
+                            <th>Podejście 2</th>
+                            <th>Data 2</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Przedmiot 1</td>
+                            <td>Wykładowca 1</td>
+                            <td>Egzamin</td>
+                            <td>Wykład</td>
+                            <td>5</td>
+                            <td>2024-01-15</td>
+                            <td>4</td>
+                            <td>2024-02-20</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="planning" class="section">
+            <div class="form-container">
+                <label>Rok, miesiąc, dzień:</label>
+                <div class="date-group">
+                    <input type="number" id="year" placeholder="Rok">
+                    <input type="number" id="month" placeholder="Miesiąc">
+                    <input type="number" id="day" placeholder="Dzień">
+                </div>
+
+                <label for="subjectName">Nazwa Przedmiotu:</label>
+                <input type="text" id="subjectName" placeholder="Wpisz nazwę przedmiotu">
+
+                <label for="lecturerName">Imię i nazwisko wykładowcy:</label>
+                <input type="text" id="lecturerName" placeholder="Wpisz imię i nazwisko wykładowcy">
+
+                <label for="classroom">Sala:</label>
+                <input type="text" id="classroom" placeholder="Wpisz numer sali">
+
+                <label for="startTime">Początek zajęć:</label>
+                <input type="time" id="startTime">
+
+                <label for="endTime">Koniec zajęć:</label>
+                <input type="time" id="endTime">
+
+                <button onclick="addToCalendar()">Zaplanuj zajęcia</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-bar"></div>
+    
+
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(id).classList.add('active');
+        }
+
+        const months = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+
+        function renderCalendar(month, year) {
+            const daysContainer = document.getElementById("calendar-days");
+            daysContainer.innerHTML = "";
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDiv = document.createElement("div");
+                daysContainer.appendChild(emptyDiv);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDiv = document.createElement("div");
+                dayDiv.className = "calendar-day";
+                dayDiv.textContent = day;
+                daysContainer.appendChild(dayDiv);
+            }
+
+            document.getElementById("calendar-month").textContent = `${months[month]} ${year}`;
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar(currentMonth, currentYear);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderCalendar(currentMonth, currentYear);
+        });
+
+        function saveAccountDetails() {
+            alert("Dane zostały zapisane!");
+        }
+
+        function addToCalendar() {
+            const year = document.getElementById("year").value;
+            const month = document.getElementById("month").value;
+            const day = document.getElementById("day").value;
+            const subject = document.getElementById("subjectName").value;
+            const lecturer = document.getElementById("lecturerName").value;
+            const classroom = document.getElementById("classroom").value;
+            const startTime = document.getElementById("startTime").value;
+            const endTime = document.getElementById("endTime").value;
+
+            if (year && month && day && subject && lecturer && classroom && startTime && endTime) {
+                alert(`Zajęcia dodane:\n\nPrzedmiot: ${subject}\nWykładowca: ${lecturer}\nSala: ${classroom}\nData: ${day}-${month}-${year}\nCzas: ${startTime} - ${endTime}`);
+            } else {
+                alert("Proszę wypełnić wszystkie pola!");
+            }
+            function saveAccountDetails() {
+    const dane = {
+        firstName: document.getElementById("firstName").value,
+        middleName: document.getElementById("middleName").value,
+        lastName: document.getElementById("lastName").value,
+        birthDate: document.getElementById("birthDate").value,
+        birthPlace: document.getElementById("birthPlace").value,
+        login: document.getElementById("login").value,
+        phoneNumber: document.getElementById("phoneNumber").value,
+        email: document.getElementById("email").value
+    };
+
+    fetch("/api/uzytkownicy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dane)
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Błąd podczas zapisu danych");
+        return response.json();
+    })
+    .then(data => {
+        alert("Dane zostały zapisane!");
+    })
+    .catch(error => {
+        console.error("Błąd:", error);
+        alert("Wystąpił problem podczas zapisu.");
+    });
+}
+
+function addToCalendar() {
+    const dane = {
+        year: document.getElementById("year").value,
+        month: document.getElementById("month").value,
+        day: document.getElementById("day").value,
+        subjectName: document.getElementById("subjectName").value,
+        lecturerName: document.getElementById("lecturerName").value,
+        classroom: document.getElementById("classroom").value,
+        startTime: document.getElementById("startTime").value,
+        endTime: document.getElementById("endTime").value
+    };
+
+    fetch("/api/zajecia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dane)
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Błąd podczas dodawania zajęć");
+        return response.json();
+    })
+    .then(data => {
+        alert("Zajęcia dodane pomyślnie!");
+    })
+    .catch(error => {
+        console.error("Błąd:", error);
+        alert("Nie udało się dodać zajęć.");
+    });
+}
+        }
+    </script>
+</body>
+</html>
